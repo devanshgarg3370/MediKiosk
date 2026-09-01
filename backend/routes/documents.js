@@ -8,26 +8,41 @@ const { runOcr } = require("../services/ocrService");
 
 const router = express.Router();
 
-const uploadDir = process.env.UPLOAD_DIR || "./data/uploads";
+const uploadDir = process.env.UPLOAD_DIR || "./uploads";
 if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, uploadDir),
-  filename: (req, file, cb) => cb(null, `${uuid()}${path.extname(file.originalname)}`),
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname);
+    cb(null, `${uuid()}${ext}`);
+  },
 });
-const upload = multer({ storage });
+
+const ALLOWED_MIME = ["image/jpeg", "image/png", "image/webp", "application/pdf"];
+const upload = multer({
+  storage,
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
+  fileFilter: (req, file, cb) => {
+    if (!ALLOWED_MIME.includes(file.mimetype)) {
+      return cb(new Error("Unsupported file type. Allowed: jpg, png, webp, pdf"));
+    }
+    cb(null, true);
+  },
+});
 
 /**
  * SCREEN 5: DOCUMENT SCANNING
- * POST /api/documents  (multipart/form-data: file, consultation_id, doc_type)
- * Stores the uploaded file, then runs (mock) OCR against it.
+ * POST /api/documents/:consultationId  (multipart/form-data, field "file")
+ * Body also expects: doc_type = prescription | lab_report | discharge_summary | other
  */
-router.post("/", upload.single("file"), (req, res) => {
-  const { consultation_id, doc_type } = req.body;
-  if (!consultation_id) return res.status(400).json({ error: "consultation_id is required" });
+router.post("/:consultationId", upload.single("file"), (req, res) => {
+  const { consultationId } = req.params;
+  const { doc_type } = req.body;
+
   if (!req.file) return res.status(400).json({ error: "file is required" });
 
-  const consultation = db.prepare(`SELECT id FROM consultations WHERE id = ?`).get(consultation_id);
+  const consultation = db.prepare(`SELECT id FROM consultations WHERE id = ?`).get(consultationId);
   if (!consultation) return res.status(404).json({ error: "Consultation not found" });
 
   const id = uuid();
@@ -36,7 +51,7 @@ router.post("/", upload.single("file"), (req, res) => {
      VALUES (?, ?, ?, ?, ?, ?, ?, 'processing')`
   ).run(
     id,
-    consultation_id,
+    consultationId,
     doc_type || "other",
     req.file.originalname,
     req.file.filename,
@@ -44,21 +59,43 @@ router.post("/", upload.single("file"), (req, res) => {
     req.file.mimetype
   );
 
-  const extracted = runOcr(doc_type, req.file.originalname);
-
+  // Mock OCR runs synchronously here since it's not a real, slow external
+  // call. Swap for an async job/queue when wiring in a real OCR provider.
+  const extracted = runOcr(doc_type || "other", req.file.originalname);
   db.prepare(
     `UPDATE documents SET ocr_status = 'completed', extracted_data = ? WHERE id = ?`
   ).run(JSON.stringify(extracted), id);
 
   const document = db.prepare(`SELECT * FROM documents WHERE id = ?`).get(id);
-  res.status(201).json({ document, extracted });
+  res.status(201).json({
+    ...document,
+    extracted_data: JSON.parse(document.extracted_data),
+  });
 });
 
-router.get("/consultation/:consultationId", (req, res) => {
-  const documents = db
+router.get("/:consultationId", (req, res) => {
+  const docs = db
     .prepare(`SELECT * FROM documents WHERE consultation_id = ? ORDER BY created_at ASC`)
-    .all(req.params.consultationId);
-  res.json({ documents });
+    .all(req.params.consultationId)
+    .map((d) => ({ ...d, extracted_data: d.extracted_data ? JSON.parse(d.extracted_data) : null }));
+  res.json({ documents: docs });
+});
+
+router.delete("/:documentId", (req, res) => {
+  const doc = db.prepare(`SELECT * FROM documents WHERE id = ?`).get(req.params.documentId);
+  if (!doc) return res.status(404).json({ error: "Document not found" });
+
+  if (doc.file_path && fs.existsSync(doc.file_path)) {
+    fs.unlinkSync(doc.file_path);
+  }
+  db.prepare(`DELETE FROM documents WHERE id = ?`).run(req.params.documentId);
+  res.json({ deleted: true });
+});
+
+router.get("/file/:documentId", (req, res) => {
+  const doc = db.prepare(`SELECT * FROM documents WHERE id = ?`).get(req.params.documentId);
+  if (!doc || !fs.existsSync(doc.file_path)) return res.status(404).json({ error: "File not found" });
+  res.sendFile(path.resolve(doc.file_path));
 });
 
 module.exports = router;

@@ -1,26 +1,29 @@
 {
   "name": "medikiosk-backend",
   "version": "1.0.0",
-  "description": "Backend API for MediKiosk - AI-assisted patient history kiosk (patient identification, consent, AI history taking, document OCR, doctor queue).",
+  "description": "Backend API for MediKiosk - AI-assisted patient history kiosk with doctor dashboard",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "seed": "node data/seed.js"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.5.0"
   },
   "dependencies": {
-    "better-sqlite3": "^11.3.0",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.0",
     "multer": "^1.4.5-lts.1",
-    "uuid": "^9.0.1"
+    "socket.io": "^4.7.5",
+    "uuid": "^14.0.2"
   },
   "devDependencies": {
     "nodemon": "^3.1.4"
-  },
-  "engines": {
-    "node": ">=18"
   }
 }
