@@ -40,6 +40,7 @@ router.post("/", (req, res) => {
 
   const consent = db.prepare(`SELECT * FROM consents WHERE id = ?`).get(id);
   const allAccepted = clinical_history && document_scan && hospital_share && abdm_integration;
+
   res.status(201).json({ consent, canProceed: !!allAccepted });
 });
 

@@ -1,4 +1,11 @@
-const Database = require("better-sqlite3");
+// Uses Node's built-in `node:sqlite` module instead of a third-party
+// native addon (better-sqlite3). This avoids requiring a C++ build chain
+// (Visual Studio Build Tools on Windows, Xcode CLT on Mac, etc.) — the
+// driver ships with Node itself. Requires Node.js >= 22.5 (see
+// "engines" in package.json). The API (`.exec`, `.prepare().run/get/all`)
+// is intentionally near-identical to better-sqlite3, so nothing else in
+// this codebase had to change.
+const { DatabaseSync } = require("node:sqlite");
 const path = require("path");
 const fs = require("fs");
 require("dotenv").config();
@@ -7,9 +14,16 @@ const dbPath = process.env.DB_PATH || "./data/medikiosk.db";
 const dbDir = path.dirname(dbPath);
 if (!fs.existsSync(dbDir)) fs.mkdirSync(dbDir, { recursive: true });
 
-const db = new Database(dbPath);
-db.pragma("journal_mode = WAL");
-db.pragma("foreign_keys = ON");
+const rawDb = new DatabaseSync(dbPath);
+rawDb.exec("PRAGMA journal_mode = WAL;");
+rawDb.exec("PRAGMA foreign_keys = ON;");
+
+// Thin wrapper so route files can keep calling db.prepare(sql).run/get/all(...)
+// exactly as they already do, with zero call-site changes.
+const db = {
+  exec: (sql) => rawDb.exec(sql),
+  prepare: (sql) => rawDb.prepare(sql),
+};
 
 // ---------------------------------------------------------------------------
 // SCHEMA
