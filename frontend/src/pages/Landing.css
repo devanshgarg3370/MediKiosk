@@ -138,144 +138,225 @@ button {
 
 /* ---------- HEADER ACTIONS ---------- */
 
+/* =====================================================
+   HEADER ACTIONS
+===================================================== */
+
 .header-actions {
   display: flex;
   align-items: center;
-  gap: 10px;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-shrink: 0;
 }
 
-.language-wrapper,
-.header-button,
-.accessibility-button {
-  height: 48px;
 
-  padding: 0 18px;
+/* =====================================================
+   LANGUAGE SELECTOR
+===================================================== */
+
+.language-selector {
+  height: 48px;
+  min-width: 145px;
+  padding: 0 13px;
 
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: 9px;
 
-  border: 1px solid #d9e7f2;
+  background: #ffffff;
+  border: 1px solid #d5e5ef;
   border-radius: 10px;
 
-  background: #ffffff;
-
-  color: #234c6d;
-
-  font-size: 15px;
-  font-weight: 600;
-
-  transition: 0.2s ease;
+  box-shadow: 0 2px 8px rgba(20, 80, 110, 0.05);
 }
 
-.language-wrapper:hover,
-.header-button:hover,
-.accessibility-button:hover {
-  border-color: #1592df;
-  background: #f6fbff;
+.language-selector .header-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 18px;
+  line-height: 1;
 }
 
-.language-wrapper select {
+.language-selector select {
+  width: 100%;
+  height: 100%;
+
   border: none;
   outline: none;
 
   background: transparent;
 
-  color: #234c6d;
-
+  color: #234d68;
+  font-family: inherit;
   font-size: 15px;
   font-weight: 600;
 
   cursor: pointer;
 }
 
-.header-icon {
-  color: #087fd1;
-  font-size: 18px;
-}
-
-.header-button span {
-  font-size: 18px;
-}
-
-.voice-active {
-  background: #eaf6ff;
-  border-color: #1592df;
-  color: #087fd1;
-}
-
-.accessibility-button {
-  min-width: 48px;
-  padding: 0 15px;
-
-  color: #087fd1;
-
-  font-size: 18px;
+.language-selector select option {
+  color: #234d68;
+  background: white;
 }
 
 
 /* =====================================================
-   ACCESSIBILITY PANEL
+   VOICE ASSISTANCE
 ===================================================== */
 
-.accessibility-panel {
-  position: fixed;
+.voice-button {
+  height: 48px;
+  min-width: 170px;
+  padding: 0 17px;
 
-  right: 7%;
-  top: 105px;
-
-  width: 360px;
-
-  padding: 24px;
-
-  background: white;
-
-  border: 1px solid #dbeaf4;
-  border-radius: 14px;
-
-  box-shadow: 0 18px 45px rgba(21, 74, 112, 0.15);
-
-  z-index: 200;
-}
-
-.accessibility-panel h3 {
-  color: #12395b;
-  font-size: 18px;
-}
-
-.accessibility-panel p {
-  margin-top: 7px;
-
-  color: #718ba0;
-
-  font-size: 14px;
-  line-height: 1.5;
-}
-
-.accessibility-options {
   display: flex;
-  flex-direction: column;
-
+  align-items: center;
+  justify-content: center;
   gap: 9px;
 
-  margin-top: 18px;
-}
+  border: 1px solid #d5e5ef;
+  border-radius: 10px;
 
-.accessibility-options button {
-  padding: 12px 14px;
+  background: #ffffff;
+  color: #315870;
 
-  background: #f4faff;
-
-  border: 1px solid #dcecf7;
-  border-radius: 8px;
-
-  color: #17699e;
-
-  font-size: 14px;
+  font-family: inherit;
+  font-size: 15px;
   font-weight: 600;
 
-  text-align: left;
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.voice-button:hover {
+  background: #f2f9fd;
+  border-color: #1590d8;
+  color: #0878bd;
+}
+
+.voice-button:active {
+  transform: translateY(1px);
+}
+
+.voice-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 17px;
+  line-height: 1;
+}
+
+.voice-active {
+  background: #eaf7ff;
+  border-color: #087fd1;
+  color: #087fd1;
+}
+
+
+/* =====================================================
+   ACCESSIBILITY
+===================================================== */
+
+.accessibility-button {
+  height: 48px;
+  min-width: 155px;
+  padding: 0 17px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+
+  border: 1px solid #087fd1;
+  border-radius: 10px;
+
+  background: #087fd1;
+  color: #ffffff;
+
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.accessibility-button:hover {
+  background: #066db3;
+  border-color: #066db3;
+}
+
+.accessibility-button:active {
+  transform: translateY(1px);
+}
+
+.accessibility-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 18px;
+  line-height: 1;
+}
+
+
+/* =====================================================
+   RESPONSIVE HEADER
+===================================================== */
+
+@media (max-width: 900px) {
+
+  .header-actions {
+    gap: 8px;
+  }
+
+  .language-selector {
+    min-width: 125px;
+  }
+
+  .voice-button {
+    min-width: 145px;
+  }
+
+  .accessibility-button {
+    min-width: 135px;
+  }
+
+  .language-selector select,
+  .voice-button,
+  .accessibility-button {
+    font-size: 13px;
+  }
+}
+
+
+@media (max-width: 700px) {
+
+  .header-actions {
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 12px;
+  }
+
+  .language-selector,
+  .voice-button,
+  .accessibility-button {
+    height: 44px;
+  }
 }
 
 
@@ -304,6 +385,7 @@ button {
       #ffffff 62%
     );
 }
+
 
 
 /* ---------- HERO CONTENT ---------- */

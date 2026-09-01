@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import PatientIdentification from "../pages/PatientIdentification";
 import "./Landing.css";
 
+
 const Landing = () => {
   const navigate = useNavigate();
 
@@ -86,55 +87,44 @@ const Landing = () => {
 
         <div className="header-actions">
 
-          <div className="language-box">
+  {/* Language */}
+  <div className="language-selector">
+    <span className="header-icon">🌐</span>
 
-            <span className="language-icon">
-              ◎
-            </span>
+    <select
+      value={language}
+      onChange={(e) => setLanguage(e.target.value)}
+    >
+      <option value="English">English</option>
+      <option value="हिन्दी">हिन्दी</option>
+      <option value="मराठी">मराठी</option>
+      <option value="বাংলা">বাংলা</option>
+      <option value="தமிழ்">தமிழ்</option>
+      <option value="తెలుగు">తెలుగు</option>
+    </select>
+  </div>
 
-            <select
-              value={language}
-              onChange={(e) => setLanguage(e.target.value)}
-              aria-label="Select language"
-            >
-              <option>English</option>
-              <option>हिन्दी</option>
-              <option>मराठी</option>
-              <option>বাংলা</option>
-              <option>தமிழ்</option>
-              <option>తెలుగు</option>
-            </select>
+  {/* Voice */}
+  <button
+    className={`voice-button ${voiceEnabled ? "voice-active" : ""}`}
+    onClick={toggleVoice}
+  >
+    <span className="voice-icon">🔊</span>
+    <span>
+      {voiceEnabled ? "Voice On" : "Voice Assistance"}
+    </span>
+  </button>
 
-          </div>
+  {/* Accessibility */}
+  <button
+    className="accessibility-button"
+    onClick={() => setShowAccessibility(!showAccessibility)}
+  >
+    <span className="accessibility-icon">♿</span>
+    <span>Accessibility</span>
+  </button>
 
-
-          <button
-            className={`voice-btn ${
-              voiceEnabled ? "voice-active" : ""
-            }`}
-            onClick={toggleVoice}
-          >
-            <span>◖</span>
-
-            {voiceEnabled
-              ? "Voice On"
-              : "Voice Assistance"}
-
-          </button>
-
-
-          <button
-            className="accessibility-btn"
-            onClick={() =>
-              setShowAccessibility(!showAccessibility)
-            }
-            aria-label="Accessibility"
-          >
-            ♿
-          </button>
-
-        </div>
-
+</div>
       </header>
 
 
