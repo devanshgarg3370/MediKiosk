@@ -46,7 +46,7 @@ const ConsentPrivacy = () => {
       return;
     }
 
-    navigate("/next-page");
+    navigate("/ai-history");
   };
 
   const handleDecline = () => {
